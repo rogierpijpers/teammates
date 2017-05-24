@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import teammates.common.datatransfer.FeedbackParticipantType;
 import teammates.common.datatransfer.FeedbackSessionResultsBundle;
+import teammates.common.datatransfer.PossibleRecipientsBundle;
 import teammates.common.datatransfer.attributes.AccountAttributes;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
@@ -1039,7 +1040,7 @@ public class InstructorFeedbackResultsPageData extends PageData {
             FeedbackQuestionAttributes question, List<FeedbackResponseAttributes> responses) {
         List<InstructorFeedbackResultsResponseRow> responseRows = new ArrayList<InstructorFeedbackResultsResponseRow>();
 
-        List<String> possibleGiversWithoutResponses = bundle.getPossibleGivers(question);
+        List<String> possibleGiversWithoutResponses = bundle.getPossibleGiversBundle().getPossibleGivers(question, bundle);
         List<String> possibleReceiversWithoutResponsesForGiver = new ArrayList<String>();
 
         String prevGiver = "";
@@ -1064,7 +1065,7 @@ public class InstructorFeedbackResultsPageData extends PageData {
                 }
                 String giverIdentifier = response.giver;
 
-                possibleReceiversWithoutResponsesForGiver = bundle.getPossibleRecipients(question, giverIdentifier);
+                possibleReceiversWithoutResponsesForGiver = new PossibleRecipientsBundle().getPossibleRecipients(question, giverIdentifier, bundle);
             }
 
             // keep track of possible recipients without a response from the current giver
@@ -1114,8 +1115,8 @@ public class InstructorFeedbackResultsPageData extends PageData {
         List<InstructorFeedbackResultsResponseRow> responseRows = new ArrayList<InstructorFeedbackResultsResponseRow>();
 
         List<String> possibleParticipantsWithoutResponses = isFirstGroupedByGiver
-                                                          ? bundle.getPossibleRecipients(question, participantIdentifier)
-                                                          : bundle.getPossibleGivers(question, participantIdentifier);
+                                                          ? new PossibleRecipientsBundle().getPossibleRecipients(question, participantIdentifier, bundle)
+                                                          : bundle.getPossibleGiversBundle().getPossibleGivers(question, participantIdentifier, bundle);
 
         for (FeedbackResponseAttributes response : responses) {
             if (!bundle.isGiverVisible(response) || !bundle.isRecipientVisible(response)) {
@@ -1304,7 +1305,7 @@ public class InstructorFeedbackResultsPageData extends PageData {
                 continue;
             }
             List<String> possibleRecipientsForRemainingGiver =
-                                            bundle.getPossibleRecipients(question, possibleGiverWithNoResponses);
+                                            new PossibleRecipientsBundle().getPossibleRecipients(question, possibleGiverWithNoResponses, bundle);
             if (isMissingResponsesShown) {
                 responseRows.addAll(
                         buildMissingResponseRowsBetweenGiverAndPossibleRecipients(

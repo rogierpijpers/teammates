@@ -13,14 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import teammates.common.datatransfer.CourseRoster;
-import teammates.common.datatransfer.FeedbackParticipantType;
-import teammates.common.datatransfer.FeedbackSessionDetailsBundle;
-import teammates.common.datatransfer.FeedbackSessionQuestionsBundle;
-import teammates.common.datatransfer.FeedbackSessionResponseStatus;
-import teammates.common.datatransfer.FeedbackSessionResultsBundle;
-import teammates.common.datatransfer.FeedbackSessionType;
-import teammates.common.datatransfer.UserRole;
+import teammates.common.datatransfer.*;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseCommentAttributes;
@@ -927,7 +920,7 @@ public final class FeedbackSessionsLogic {
 
         exportBuilder.append(questionDetails.getCsvDetailedResponsesHeader());
 
-        List<String> possibleGiversWithoutResponses = fsrBundle.getPossibleGivers(question);
+        List<String> possibleGiversWithoutResponses = fsrBundle.getPossibleGiversBundle().getPossibleGivers(question, fsrBundle);
         List<String> possibleRecipientsForGiver = new ArrayList<String>();
         String prevGiver = "";
 
@@ -953,7 +946,7 @@ public final class FeedbackSessionsLogic {
                                              ? fsrBundle.getFullNameFromRoster(response.giver)
                                              : response.giver;
 
-                possibleRecipientsForGiver = fsrBundle.getPossibleRecipients(question, giverIdentifier);
+                possibleRecipientsForGiver = new PossibleRecipientsBundle().getPossibleRecipients(question, giverIdentifier, fsrBundle);
             }
 
             removeParticipantIdentifierFromList(question.recipientType, possibleRecipientsForGiver,
@@ -1020,7 +1013,7 @@ public final class FeedbackSessionsLogic {
 
         for (String possibleGiverWithNoResponses : remainingPossibleGivers) {
             List<String> possibleRecipientsForRemainingGiver =
-                    results.getPossibleRecipients(entry.getKey(), possibleGiverWithNoResponses);
+                    new PossibleRecipientsBundle().getPossibleRecipients(entry.getKey(), possibleGiverWithNoResponses, results);
 
             exportBuilder.append(getRowsOfPossibleRecipientsInCsvFormat(results,
                     question, questionDetails, possibleRecipientsForRemainingGiver,
