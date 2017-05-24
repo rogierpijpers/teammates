@@ -309,7 +309,7 @@ public final class FeedbackSessionsLogic {
 
             updateBundleAndRecipientListWithResponsesForInstructor(courseId,
                     userEmail, fsa, instructor, bundle, recipientList,
-                    question, instructorGiver, null);
+                    new QuestionInstructorStudentParameterObject(question, instructorGiver, null));
         }
 
         return new FeedbackSessionQuestionsBundle(fsa, bundle, recipientList);
@@ -337,7 +337,7 @@ public final class FeedbackSessionsLogic {
 
         updateBundleAndRecipientListWithResponsesForInstructor(courseId,
                 userEmail, fsa, instructor, bundle, recipientList,
-                question, instructorGiver, null);
+                new QuestionInstructorStudentParameterObject(question, instructorGiver, null));
 
         return new FeedbackSessionQuestionsBundle(fsa, bundle, recipientList);
     }
@@ -348,17 +348,15 @@ public final class FeedbackSessionsLogic {
             FeedbackSessionAttributes fsa,
             InstructorAttributes instructor,
             Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> bundle,
-            Map<String, Map<String, String>> recipientList,
-            FeedbackQuestionAttributes question,
-            InstructorAttributes instructorGiver, StudentAttributes studentGiver)
+            Map<String, Map<String, String>> recipientList, QuestionInstructorStudentParameterObject questionInstructorStudentParameterObject)
             throws EntityDoesNotExistException {
         List<FeedbackResponseAttributes> responses =
                 frLogic.getFeedbackResponsesFromGiverForQuestion(
-                        question.getId(), userEmail);
+                        questionInstructorStudentParameterObject.getQuestion().getId(), userEmail);
         Map<String, String> recipients =
-                fqLogic.getRecipientsForQuestion(question, userEmail, instructorGiver, studentGiver);
+                fqLogic.getRecipientsForQuestion(questionInstructorStudentParameterObject.getQuestion(), userEmail, questionInstructorStudentParameterObject.getInstructorGiver(), questionInstructorStudentParameterObject.getStudentGiver());
         // instructor can only see students in allowed sections for him/her
-        if (question.recipientType.equals(FeedbackParticipantType.STUDENTS)) {
+        if (questionInstructorStudentParameterObject.getQuestion().recipientType.equals(FeedbackParticipantType.STUDENTS)) {
             Iterator<Map.Entry<String, String>> iter = recipients.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, String> studentEntry = iter.next();
@@ -370,7 +368,7 @@ public final class FeedbackSessionsLogic {
             }
         }
         // instructor can only see teams in allowed sections for him/her
-        if (question.recipientType.equals(FeedbackParticipantType.TEAMS)) {
+        if (questionInstructorStudentParameterObject.getQuestion().recipientType.equals(FeedbackParticipantType.TEAMS)) {
             Iterator<Map.Entry<String, String>> iter = recipients.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, String> teamEntry = iter.next();
@@ -381,10 +379,10 @@ public final class FeedbackSessionsLogic {
                 }
             }
         }
-        normalizeMaximumResponseEntities(question, recipients);
+        normalizeMaximumResponseEntities(questionInstructorStudentParameterObject.getQuestion(), recipients);
 
-        bundle.put(question, responses);
-        recipientList.put(question.getId(), recipients);
+        bundle.put(questionInstructorStudentParameterObject.getQuestion(), responses);
+        recipientList.put(questionInstructorStudentParameterObject.getQuestion().getId(), recipients);
     }
 
     /**
