@@ -76,48 +76,18 @@ public class AdminEmailListGenerator extends RemoteApiClient {
             System.out.print(e.getMessage() + "\n");
         }
 
-        System.out.print("\n\nstudent : " + emailListConfig.student + "\n");
+        printStudentStatus();
 
-        if (emailListConfig.student) {
-            System.out.print("Student Status: ");
-            switch (emailListConfig.studentStatus) {
-            case REG:
-                System.out.print("REG\n");
-                break;
-            case UNREG:
-                System.out.print("UNREG\n");
-                break;
-            case ALL:
-            default:
-                System.out.print("ALL\n");
-                break;
-            }
-        }
+        printInstructorStatus();
 
-        if (emailListConfig.studentCreatedDateRangeStart != null) {
-            System.out.print("student start : " + emailListConfig.studentCreatedDateRangeStart + "\n");
-        }
+    }
 
-        if (emailListConfig.studentCreatedDateRangeEnd != null) {
-            System.out.print("student end : " + emailListConfig.studentCreatedDateRangeEnd + "\n");
-        }
-
+    private void printInstructorStatus() {
         System.out.print("instructor : " + emailListConfig.instructor + "\n");
 
         if (emailListConfig.instructor) {
             System.out.print("Instructor Status: ");
-            switch (emailListConfig.studentStatus) {
-            case REG:
-                System.out.print("REG\n");
-                break;
-            case UNREG:
-                System.out.print("UNREG\n");
-                break;
-            case ALL:
-            default:
-                System.out.print("ALL\n");
-                break;
-            }
+            System.out.println(emailListConfig.studentStatus + "\n");
         }
 
         if (emailListConfig.instructorCreatedDateRangeStart != null) {
@@ -127,7 +97,23 @@ public class AdminEmailListGenerator extends RemoteApiClient {
         if (emailListConfig.instructorCreatedDateRangeEnd != null) {
             System.out.print("instructor end : " + emailListConfig.instructorCreatedDateRangeEnd + "\n");
         }
+    }
 
+    private void printStudentStatus() {
+        System.out.print("\n\nstudent : " + emailListConfig.student + "\n");
+
+        if (emailListConfig.student) {
+            System.out.print("Student Status: ");
+            System.out.println(emailListConfig.studentStatus + "\n");
+        }
+
+        if (emailListConfig.studentCreatedDateRangeStart != null) {
+            System.out.print("student start : " + emailListConfig.studentCreatedDateRangeStart + "\n");
+        }
+
+        if (emailListConfig.studentCreatedDateRangeEnd != null) {
+            System.out.print("student end : " + emailListConfig.studentCreatedDateRangeEnd + "\n");
+        }
     }
 
     private void getInstructorEmailConfiguration() throws InvalidParametersException {
