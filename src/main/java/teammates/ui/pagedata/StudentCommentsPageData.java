@@ -7,6 +7,7 @@ import java.util.Map;
 
 import teammates.common.datatransfer.CourseRoster;
 import teammates.common.datatransfer.FeedbackSessionResultsBundle;
+import teammates.common.datatransfer.QuestionResponseMapBundle;
 import teammates.common.datatransfer.attributes.AccountAttributes;
 import teammates.common.datatransfer.attributes.CommentAttributes;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
@@ -184,7 +185,7 @@ public class StudentCommentsPageData extends PageData {
         List<QuestionTable> feedbackQuestionTables = new ArrayList<QuestionTable>();
 
         for (Map.Entry<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> responseEntries
-                     : feedbackResultBundle.getQuestionResponseMap().entrySet()) {
+                     : feedbackResultBundle.getQuestionResponseMapBundle().getQuestionResponseMap(feedbackResultBundle).entrySet()) {
 
             FeedbackQuestionAttributes feedbackQuestion = responseEntries.getKey();
             int questionNumber = feedbackQuestion.questionNumber;

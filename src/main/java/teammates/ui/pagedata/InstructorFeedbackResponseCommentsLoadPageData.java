@@ -9,6 +9,7 @@ import java.util.Map;
 import teammates.common.datatransfer.CommentSendingState;
 import teammates.common.datatransfer.FeedbackParticipantType;
 import teammates.common.datatransfer.FeedbackSessionResultsBundle;
+import teammates.common.datatransfer.QuestionResponseMapBundle;
 import teammates.common.datatransfer.attributes.AccountAttributes;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
@@ -44,7 +45,7 @@ public class InstructorFeedbackResponseCommentsLoadPageData extends PageData {
         questionCommentsMap = new LinkedHashMap<>();
 
         for (Map.Entry<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> responseEntries
-                 : bundle.getQuestionResponseMap().entrySet()) {
+                 : bundle.getQuestionResponseMapBundle().getQuestionResponseMap(bundle).entrySet()) {
             FeedbackQuestionAttributes question = bundle.questions.get(responseEntries.getKey().getId());
             Map<FeedbackParticipantType, Boolean> responseVisibilityMap = getResponseVisibilityMap(question);
 

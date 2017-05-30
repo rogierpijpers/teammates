@@ -35,6 +35,9 @@ public class FeedbackSessionResultsBundle {
 
     private PossibleGiversBundle possibleGiversBundle;
     private PossibleRecipientsBundle possibleRecipientsBundle;
+    private SortedResponseBundle sortedResponseBundle;
+    private QuestionResponseMapBundle questionResponseMapBundle;
+    private RosterBundle rosterBundle;
 
     public FeedbackSessionAttributes feedbackSession;
     public List<FeedbackResponseAttributes> responses;
@@ -48,7 +51,7 @@ public class FeedbackSessionResultsBundle {
     public FeedbackSessionResponseStatus responseStatus;
     public CourseRoster roster;
     public Map<String, List<FeedbackResponseCommentAttributes>> responseComments;
-    public boolean isComplete;
+    private boolean isComplete;
 
     /**
      * Responses with identities of giver/recipients NOT hidden.
@@ -70,6 +73,28 @@ public class FeedbackSessionResultsBundle {
 
     public void setPossibleRecipientsBundle(PossibleRecipientsBundle possibleRecipientsBundle) {
         this.possibleRecipientsBundle = possibleRecipientsBundle;
+    }
+
+    public QuestionResponseMapBundle getQuestionResponseMapBundle() {
+        return questionResponseMapBundle;
+    }
+
+    public void setQuestionResponseMapBundle(QuestionResponseMapBundle questionResponseMapBundle) {
+        this.questionResponseMapBundle = questionResponseMapBundle;
+    }
+
+    public SortedResponseBundle getSortedResponseBundle() {
+        return sortedResponseBundle;
+    }
+
+    public void setSortedResponseBundle(SortedResponseBundle sortedResponseBundle) {
+        this.sortedResponseBundle = sortedResponseBundle;
+    }
+
+    public RosterBundle getRosterBundle(){ return rosterBundle; };
+
+    public void setRosterBundle(RosterBundle rosterBundle){
+        this.rosterBundle = rosterBundle;
     }
 
     // For contribution questions.
@@ -100,7 +125,7 @@ public class FeedbackSessionResultsBundle {
             new CompareByGiverRecipientQuestionComparator(this);
 
     // Sorts by giverName > recipientName
-    private Comparator<FeedbackResponseAttributes> compareByGiverRecipient =
+    Comparator<FeedbackResponseAttributes> compareByGiverRecipient =
             new CompareByGiverRecipientComparator(this);
 
     // Sorts by teamName > giverName > recipientName > qnNumber
@@ -124,23 +149,23 @@ public class FeedbackSessionResultsBundle {
             new CompareByTeamGiverQuestionTeamRecipientComparator(this);
 
     // Sorts by recipientName > question > giverTeam > giverName
-    private final Comparator<FeedbackResponseAttributes> compareByRecipientQuestionTeamGiver =
+    final Comparator<FeedbackResponseAttributes> compareByRecipientQuestionTeamGiver =
             new CompareByRecipientQuestionTeamGiverComparator(this);
 
     // Sorts by recipientTeam > recipientName > question > giverTeam > giverName
-    private Comparator<FeedbackResponseAttributes> compareByTeamRecipientQuestionTeamGiver =
+    Comparator<FeedbackResponseAttributes> compareByTeamRecipientQuestionTeamGiver =
             new CompareByTeamRecipientQuestionTeamGiverComparator(this);
 
     // Sorts by recipientTeam > question > recipientName > giverTeam > giverName
-    private Comparator<FeedbackResponseAttributes> compareByTeamQuestionRecipientTeamGiver =
+    Comparator<FeedbackResponseAttributes> compareByTeamQuestionRecipientTeamGiver =
             new CompareByTeamQuestionRecipientTeamGiverComparator(this);
 
     // Sorts by giverTeam > question > giverName > recipientTeam > recipientName
-    private Comparator<FeedbackResponseAttributes> compareByTeamQuestionGiverTeamRecipient =
+    Comparator<FeedbackResponseAttributes> compareByTeamQuestionGiverTeamRecipient =
             new CompareByTeamQuestionGiverTeamRecipientComparator(this);
 
     // Sorts by recipientName > recipientEmail > giverName > giverEmail
-    private Comparator<FeedbackResponseAttributes> compareByRecipientNameEmailGiverNameEmail =
+    Comparator<FeedbackResponseAttributes> compareByRecipientNameEmailGiverNameEmail =
             new CompareByRecipientNameEmailGiverNameEmailComparator(this);
 
     public FeedbackSessionResultsBundle(FeedbackSessionAttributes feedbackSession,
@@ -149,6 +174,7 @@ public class FeedbackSessionResultsBundle {
              new HashMap<String, String>(), new HashMap<String, String>(), new HashMap<String, Set<String>>(),
              new HashMap<String, boolean[]>(), new FeedbackSessionResponseStatus(), roster,
              new HashMap<String, List<FeedbackResponseCommentAttributes>>());
+        createBundles();
     }
 
     public FeedbackSessionResultsBundle(FeedbackSessionAttributes feedbackSession,
@@ -164,6 +190,7 @@ public class FeedbackSessionResultsBundle {
                                         Map<String, List<FeedbackResponseCommentAttributes>> responseComments) {
         this(feedbackSession, responses, questions, emailNameTable, emailLastNameTable,
              emailTeamNameTable, sectionTeamNameTable, visibilityTable, responseStatus, roster, responseComments, true);
+        createBundles();
     }
 
     public FeedbackSessionResultsBundle(FeedbackSessionAttributes feedbackSession,
@@ -211,6 +238,15 @@ public class FeedbackSessionResultsBundle {
         // roster.*Table is populated using the CourseRoster data directly
         this.rosterTeamNameMembersTable = getTeamNameToEmailsTableFromRoster(roster);
         this.rosterSectionTeamNameTable = getSectionToTeamNamesFromRoster(roster);
+        createBundles();
+    }
+
+    private void createBundles(){
+        this.possibleGiversBundle = new PossibleGiversBundle();
+        this.possibleRecipientsBundle = new PossibleRecipientsBundle();
+        this.questionResponseMapBundle = new QuestionResponseMapBundle();
+        this.sortedResponseBundle = new SortedResponseBundle();
+        this.rosterBundle = new RosterBundle();
     }
 
     /**
@@ -319,165 +355,6 @@ public class FeedbackSessionResultsBundle {
         return Long.toString(Math.abs((long) name.hashCode()));
     }
 
-    private String getNameFromRoster(String participantIdentifier, boolean isFullName) {
-        if (participantIdentifier.equals(Const.GENERAL_QUESTION)) {
-            return Const.USER_NOBODY_TEXT;
-        }
-
-        // return person name if participant is a student
-        if (isParticipantIdentifierStudent(participantIdentifier)) {
-            StudentAttributes student = roster.getStudentForEmail(participantIdentifier);
-            if (isFullName) {
-                return student.name;
-            }
-            return student.lastName;
-        }
-
-        // return person name if participant is an instructor
-        if (isParticipantIdentifierInstructor(participantIdentifier)) {
-            return roster.getInstructorForEmail(participantIdentifier)
-                         .name;
-        }
-
-        // return team name if participantIdentifier is a team name
-        boolean isTeamName = rosterTeamNameMembersTable.containsKey(participantIdentifier);
-        if (isTeamName) {
-            return participantIdentifier;
-        }
-
-        // return team name if participant is team identified by a member
-        boolean isNameRepresentingStudentsTeam = participantIdentifier.contains(Const.TEAM_OF_EMAIL_OWNER);
-        if (isNameRepresentingStudentsTeam) {
-            int index = participantIdentifier.indexOf(Const.TEAM_OF_EMAIL_OWNER);
-            return getTeamNameFromRoster(participantIdentifier.substring(0, index));
-        }
-
-        return "";
-    }
-
-    /**
-     * Get the displayable full name from an email.
-     *
-     * <p>This function is different from {@link #getNameForEmail} as it obtains the name
-     * using the class roster, instead of from the responses.
-     * @return the full name of a student, if participantIdentifier is the email of a student, <br>
-     *         the name of an instructor, if participantIdentifier is the email of an instructor, <br>
-     *         or the team name, if participantIdentifier represents a team. <br>
-     *         Otherwise, return an empty string
-     */
-    public String getFullNameFromRoster(String participantIdentifier) {
-        return getNameFromRoster(participantIdentifier, true);
-    }
-
-    /**
-     * Get the displayable last name from an email.
-     *
-     * <p>This function is different from {@link #getLastNameForEmail} as it obtains the name
-     * using the class roster, instead of from the responses.
-     * @return the last name of a student, if participantIdentifier is the email of a student, <br>
-     *         the name of an instructor, if participantIdentifier is the email of an instructor, <br>
-     *         or the team name, if participantIdentifier represents a team. <br>
-     *         Otherwise, return an empty string
-     */
-    public String getLastNameFromRoster(String participantIdentifier) {
-        return getNameFromRoster(participantIdentifier, false);
-    }
-
-    /**
-     * Return true if the participantIdentifier is an email of either a student
-     * or instructor in the course roster. Otherwise, return false.
-     *
-     * @return true if the participantIdentifier is an email of either a student
-     *         or instructor in the course roster, false otherwise.
-     */
-    public boolean isEmailOfPersonFromRoster(String participantIdentifier) {
-        boolean isStudent = isParticipantIdentifierStudent(participantIdentifier);
-        boolean isInstructor = isParticipantIdentifierInstructor(participantIdentifier);
-        return isStudent || isInstructor;
-    }
-
-    /**
-     * If the participantIdentifier identifies a student or instructor,
-     * the participantIdentifier is returned.
-     *
-     * <p>Otherwise, Const.USER_NOBODY_TEXT is returned.
-     * @see #getDisplayableEmail
-     */
-    public String getDisplayableEmailFromRoster(String participantIdentifier) {
-        if (isEmailOfPersonFromRoster(participantIdentifier)) {
-            return participantIdentifier;
-        }
-        return Const.USER_NOBODY_TEXT;
-    }
-
-    /**
-     * Get the displayable team name from an email.
-     * If the email is not an email of someone in the class roster, an empty string is returned.
-     *
-     * <p>This function is different from {@link #getTeamNameForEmail} as it obtains the name
-     * using the class roster, instead of from the responses.
-     */
-    public String getTeamNameFromRoster(String participantIdentifier) {
-        if (participantIdentifier.equals(Const.GENERAL_QUESTION)) {
-            return Const.USER_NOBODY_TEXT;
-        }
-        if (isParticipantIdentifierStudent(participantIdentifier)) {
-            return roster.getStudentForEmail(participantIdentifier).team;
-        } else if (isParticipantIdentifierInstructor(participantIdentifier)) {
-            return Const.USER_TEAM_FOR_INSTRUCTOR;
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Get the displayable section name from an email.
-     *
-     * <p>If the email is not an email of someone in the class roster, an empty string is returned.
-     *
-     * <p>If the email of an instructor or "%GENERAL%" is passed in, "No specific recipient" is returned.
-     */
-    public String getSectionFromRoster(String participantIdentifier) {
-        boolean isStudent = isParticipantIdentifierStudent(participantIdentifier);
-        boolean isInstructor = isParticipantIdentifierInstructor(participantIdentifier);
-        boolean participantIsGeneral = participantIdentifier.equals(Const.GENERAL_QUESTION);
-
-        if (isStudent) {
-            return roster.getStudentForEmail(participantIdentifier)
-                         .section;
-        } else if (isInstructor || participantIsGeneral) {
-            return Const.NO_SPECIFIC_RECIPIENT;
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Get the emails of the students given a teamName,
-     * if teamName is "Instructors", returns the list of instructors.
-     * @return a set of emails of the students in the team
-     */
-    public Set<String> getTeamMembersFromRoster(String teamName) {
-        if (!rosterTeamNameMembersTable.containsKey(teamName)) {
-            return new HashSet<String>();
-        }
-
-        return new HashSet<String>(rosterTeamNameMembersTable.get(teamName));
-    }
-
-    /**
-     * Get the team names in a section. <br>
-     *
-     * <p>Instructors are not contained in any section.
-     * @return a set of team names of the teams in the section
-     */
-    public Set<String> getTeamsInSectionFromRoster(String sectionName) {
-        if (rosterSectionTeamNameTable.containsKey(sectionName)) {
-            return new HashSet<String>(rosterSectionTeamNameTable.get(sectionName));
-        }
-        return new HashSet<String>();
-    }
-
     public boolean isParticipantIdentifierStudent(String participantIdentifier) {
         StudentAttributes student = roster.getStudentForEmail(participantIdentifier);
         return student != null;
@@ -489,79 +366,6 @@ public class FeedbackSessionResultsBundle {
     }
 
     // TODO code duplication between this function and in FeedbackQuestionsLogic getRecipientsForQuestion
-
-    List<String> getSortedListOfTeamsExcludingOwnTeam(StudentAttributes student) {
-        String studentTeam = student.team;
-        List<String> listOfTeams = getSortedListOfTeams();
-        listOfTeams.remove(studentTeam);
-        return listOfTeams;
-    }
-
-    /**
-     * Get a sorted list of teams for the feedback session.<br>
-     * Instructors are not present as a team.
-     */
-    List<String> getSortedListOfTeams() {
-        List<String> teams = new ArrayList<String>(rosterTeamNameMembersTable.keySet());
-        teams.remove(Const.USER_TEAM_FOR_INSTRUCTOR);
-        Collections.sort(teams);
-        return teams;
-    }
-
-    /**
-     * Get a sorted list of team members, who are in the same team as the student.<br>
-     * This list includes the student.
-     *
-     * @return a list of team members, including the original student
-     * @see #getSortedListOfTeamMembersEmailsExcludingSelf
-     */
-    public List<String> getSortedListOfTeamMembersEmails(StudentAttributes student) {
-        String teamName = student.team;
-        Set<String> teamMembersEmailsToNames = rosterTeamNameMembersTable.get(teamName);
-        List<String> teamMembers = new ArrayList<String>(teamMembersEmailsToNames);
-        Collections.sort(teamMembers);
-        return teamMembers;
-    }
-
-    /**
-     * Get a sorted list of team members, who are in the same team as the student,
-     * EXCLUDING the student.
-     *
-     * @return a list of team members, excluding the original student
-     * @see #getSortedListOfTeamMembersEmails
-     */
-    List<String> getSortedListOfTeamMembersEmailsExcludingSelf(StudentAttributes student) {
-        List<String> teamMembers = getSortedListOfTeamMembersEmails(student);
-        String currentStudentEmail = student.email;
-        teamMembers.remove(currentStudentEmail);
-        return teamMembers;
-    }
-
-    /**
-     * Returns a list of student emails, sorted by section name.
-     */
-    List<String> getSortedListOfStudentEmails() {
-        List<String> emailList = new ArrayList<String>();
-        List<StudentAttributes> students = roster.getStudents();
-        StudentAttributes.sortBySectionName(students);
-        for (StudentAttributes student : students) {
-            emailList.add(student.email);
-        }
-        return emailList;
-    }
-
-    /**
-     * Returns a list of instructor emails, sorted alphabetically.
-     */
-    List<String> getSortedListOfInstructorEmails() {
-        List<String> emailList = new ArrayList<String>();
-        List<InstructorAttributes> instructors = roster.getInstructors();
-        for (InstructorAttributes instructor : instructors) {
-            emailList.add(instructor.email);
-        }
-        Collections.sort(emailList);
-        return emailList;
-    }
 
     /**
      * Used for instructor feedback results views.
@@ -721,170 +525,6 @@ public class FeedbackSessionResultsBundle {
     }
 
     // TODO: make responses to the student calling this method always on top.
-    /**
-     * Gets the questions and responses in this bundle as a map.
-     *
-     * @return An ordered {@code Map} with keys as {@link FeedbackQuestionAttributes}
-     *         sorted by questionNumber.
-     *         The mapped values for each key are the corresponding
-     *         {@link FeedbackResponseAttributes} as a {@code List}.
-     */
-    public Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> getQuestionResponseMap() {
-        if (questions == null || responses == null) {
-            return null;
-        }
-
-        Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> sortedMap =
-                new LinkedHashMap<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>();
-        List<FeedbackQuestionAttributes> sortedQuestions = new ArrayList<>(questions.values());
-        // sorts the questions by its natural ordering, which is by question number
-        Collections.sort(sortedQuestions);
-        for (FeedbackQuestionAttributes question : sortedQuestions) {
-            sortedMap.put(question, new ArrayList<FeedbackResponseAttributes>());
-        }
-
-        for (FeedbackResponseAttributes response : responses) {
-            FeedbackQuestionAttributes question = questions.get(response.feedbackQuestionId);
-            List<FeedbackResponseAttributes> responsesForQuestion = sortedMap.get(question);
-            responsesForQuestion.add(response);
-        }
-
-        for (List<FeedbackResponseAttributes> responsesForQuestion : sortedMap.values()) {
-            Collections.sort(responsesForQuestion, compareByGiverRecipient);
-        }
-
-        return sortedMap;
-    }
-
-    public Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> getQuestionResponseMapSortedByRecipient() {
-        if (questions == null || responses == null) {
-            return null;
-        }
-
-        Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> sortedMap =
-                new LinkedHashMap<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>();
-
-        List<FeedbackQuestionAttributes> sortedQuestions = new ArrayList<>(questions.values());
-        // sorts the questions by its natural ordering, which is by question number
-        Collections.sort(sortedQuestions);
-        for (FeedbackQuestionAttributes question : sortedQuestions) {
-            sortedMap.put(question, new ArrayList<FeedbackResponseAttributes>());
-        }
-
-        for (FeedbackResponseAttributes response : responses) {
-            FeedbackQuestionAttributes question = questions.get(response.feedbackQuestionId);
-            List<FeedbackResponseAttributes> responsesForQuestion = sortedMap.get(question);
-            responsesForQuestion.add(response);
-        }
-
-        for (List<FeedbackResponseAttributes> responsesForQuestion : sortedMap.values()) {
-            Collections.sort(responsesForQuestion, compareByRecipientNameEmailGiverNameEmail);
-        }
-
-        return sortedMap;
-    }
-
-    public LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>>
-            getQuestionResponseMapByRecipientTeam() {
-        LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>> sortedMap =
-                new LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>>();
-
-        Collections.sort(responses, compareByTeamQuestionRecipientTeamGiver);
-
-        for (FeedbackResponseAttributes response : responses) {
-            String recipientTeam = getTeamNameForEmail(response.recipient);
-            if (recipientTeam.isEmpty()) {
-                recipientTeam = getNameForEmail(response.recipient);
-            }
-
-            if (!sortedMap.containsKey(recipientTeam)) {
-                sortedMap.put(recipientTeam,
-                        new LinkedHashMap<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>());
-            }
-            Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> responsesForOneRecipient =
-                                            sortedMap.get(recipientTeam);
-
-            FeedbackQuestionAttributes question = questions.get(response.feedbackQuestionId);
-            if (!responsesForOneRecipient.containsKey(question)) {
-                responsesForOneRecipient.put(question, new ArrayList<FeedbackResponseAttributes>());
-            }
-
-            List<FeedbackResponseAttributes> responsesForOneRecipientOneQuestion =
-                                            responsesForOneRecipient.get(question);
-            responsesForOneRecipientOneQuestion.add(response);
-        }
-
-        return sortedMap;
-    }
-
-    public LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>>
-            getQuestionResponseMapByGiverTeam() {
-        LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>> sortedMap =
-                new LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>>();
-
-        Collections.sort(responses, compareByTeamQuestionGiverTeamRecipient);
-
-        for (FeedbackResponseAttributes response : responses) {
-            String giverTeam = getTeamNameForEmail(response.giver);
-            if (giverTeam.isEmpty()) {
-                giverTeam = getNameForEmail(response.giver);
-            }
-
-            if (!sortedMap.containsKey(giverTeam)) {
-                sortedMap.put(giverTeam,
-                        new LinkedHashMap<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>());
-            }
-            Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> responsesFromOneGiver =
-                                            sortedMap.get(giverTeam);
-
-            FeedbackQuestionAttributes question = questions.get(response.feedbackQuestionId);
-            if (!responsesFromOneGiver.containsKey(question)) {
-                responsesFromOneGiver.put(question, new ArrayList<FeedbackResponseAttributes>());
-            }
-
-            List<FeedbackResponseAttributes> responsesFromOneGiverOneQuestion = responsesFromOneGiver.get(question);
-            responsesFromOneGiverOneQuestion.add(response);
-        }
-
-        return sortedMap;
-    }
-
-    /**
-     * Returns responses as a {@code Map<recipientName, Map<question, List<response>>>}
-     * Where the responses are sorted in the order of recipient, question, giver.
-     * @return responses sorted by Recipient > Question > Giver
-     */
-    public Map<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>>
-            getResponsesSortedByRecipientQuestionGiver(boolean sortByTeam) {
-        Map<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>> sortedMap =
-                new LinkedHashMap<String, Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>>();
-
-        if (sortByTeam) {
-            Collections.sort(responses, compareByTeamRecipientQuestionTeamGiver);
-        } else {
-            Collections.sort(responses, compareByRecipientQuestionTeamGiver);
-        }
-
-        for (FeedbackResponseAttributes response : responses) {
-            String recipientEmail = response.recipient;
-            if (!sortedMap.containsKey(recipientEmail)) {
-                sortedMap.put(recipientEmail,
-                              new LinkedHashMap<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>());
-            }
-            Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> responsesForOneRecipient =
-                                            sortedMap.get(recipientEmail);
-
-            FeedbackQuestionAttributes question = questions.get(response.feedbackQuestionId);
-            if (!responsesForOneRecipient.containsKey(question)) {
-                responsesForOneRecipient.put(question, new ArrayList<FeedbackResponseAttributes>());
-            }
-            List<FeedbackResponseAttributes> responsesForOneRecipientOneQuestion =
-                                            responsesForOneRecipient.get(question);
-            responsesForOneRecipientOneQuestion.add(response);
-        }
-
-        return sortedMap;
-    }
 
     /**
      * Returns the responses in this bundle as a {@code Tree} structure with no base node
@@ -1181,7 +821,7 @@ public class FeedbackSessionResultsBundle {
         return sectionToTeam;
     }
 
-    int compareByQuestionNumber(FeedbackResponseAttributes r1,
+    public int compareByQuestionNumber(FeedbackResponseAttributes r1,
                                         FeedbackResponseAttributes r2) {
         FeedbackQuestionAttributes q1 = questions.get(r1.feedbackQuestionId);
         FeedbackQuestionAttributes q2 = questions.get(r2.feedbackQuestionId);
@@ -1197,7 +837,7 @@ public class FeedbackSessionResultsBundle {
      * @param isFirstNameVisible  true if the first name should be visible to the user
      * @param isSecondNameVisible true if the second name should be visible to the user
      */
-    int compareByNames(String name1, String name2,
+    public int compareByNames(String name1, String name2,
                                boolean isFirstNameVisible, boolean isSecondNameVisible) {
         if (!isFirstNameVisible && !isSecondNameVisible) {
             return 0;
@@ -1227,7 +867,7 @@ public class FeedbackSessionResultsBundle {
         return order == 0 ? name1.compareTo(name2) : order;
     }
 
-    int compareByResponseString(FeedbackResponseAttributes o1, FeedbackResponseAttributes o2) {
+    public int compareByResponseString(FeedbackResponseAttributes o1, FeedbackResponseAttributes o2) {
         String responseAnswer1 = o1.getResponseDetails().getAnswerString();
 
         String responseAnswer2 = o2.getResponseDetails().getAnswerString();
@@ -1289,6 +929,10 @@ public class FeedbackSessionResultsBundle {
 
     public boolean isComplete() {
         return isComplete;
+    }
+
+    public void complete(){
+        this.isComplete = true;
     }
 
 }

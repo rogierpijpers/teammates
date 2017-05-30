@@ -10,10 +10,7 @@ import java.util.Set;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import teammates.common.datatransfer.CourseRoster;
-import teammates.common.datatransfer.DataBundle;
-import teammates.common.datatransfer.FeedbackSessionResponseStatus;
-import teammates.common.datatransfer.FeedbackSessionResultsBundle;
+import teammates.common.datatransfer.*;
 import teammates.common.datatransfer.attributes.AccountAttributes;
 import teammates.common.datatransfer.attributes.CommentAttributes;
 import teammates.common.datatransfer.attributes.CourseAttributes;
@@ -117,7 +114,7 @@ public class StudentCommentsPageDataTest extends BaseTestCase {
         List<QuestionTable> questionTables = new ArrayList<QuestionTable>();
         FeedbackSessionAttributes session = bundle.feedbackSession;
         Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> questionToResponsesMap =
-                bundle.getQuestionResponseMap();
+                bundle.getQuestionResponseMapBundle().getQuestionResponseMap(bundle);
         for (Map.Entry<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> entry
                 : questionToResponsesMap.entrySet()) {
             List<ResponseRow> responseRows = new ArrayList<ResponseRow>();

@@ -3,6 +3,7 @@ package teammates.ui.controller;
 import java.util.List;
 import java.util.Map;
 
+import teammates.common.datatransfer.QuestionResponseMapBundle;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
 import teammates.common.datatransfer.attributes.StudentAttributes;
@@ -59,7 +60,7 @@ public class StudentFeedbackResultsPageAction extends Action {
                         + "Course ID: " + courseId;
 
         Map<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>> questionsWithResponses =
-                                        data.getBundle().getQuestionResponseMapSortedByRecipient();
+                                        new QuestionResponseMapBundle().getQuestionResponseMapSortedByRecipient(data.getBundle());
         data.init(questionsWithResponses);
         return createShowPageResult(Const.ViewURIs.STUDENT_FEEDBACK_RESULTS, data);
     }

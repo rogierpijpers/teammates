@@ -57,14 +57,14 @@ public class PossibleRecipientsBundle {
 
         switch (recipientType) {
         case STUDENTS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfStudentEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfStudentEmails(feedbackSessionResultsBundle);
             break;
         case INSTRUCTORS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfInstructorEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfInstructorEmails(feedbackSessionResultsBundle);
             possibleRecipients.remove(instructorGiver.email);
             break;
         case TEAMS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfTeams();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfTeams(feedbackSessionResultsBundle);
             break;
         case SELF:
             possibleRecipients.add(instructorGiver.email);
@@ -98,20 +98,20 @@ public class PossibleRecipientsBundle {
 
         switch (recipientType) {
         case STUDENTS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfStudentEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfStudentEmails(feedbackSessionResultsBundle);
             possibleRecipients.remove(studentGiver.email);
             break;
         case OWN_TEAM_MEMBERS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfTeamMembersEmailsExcludingSelf(studentGiver);
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfTeamMembersEmailsExcludingSelf(studentGiver, feedbackSessionResultsBundle);
             break;
         case OWN_TEAM_MEMBERS_INCLUDING_SELF:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfTeamMembersEmails(studentGiver);
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfTeamMembersEmails(studentGiver, feedbackSessionResultsBundle);
             break;
         case INSTRUCTORS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfInstructorEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfInstructorEmails(feedbackSessionResultsBundle);
             break;
         case TEAMS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfTeamsExcludingOwnTeam(studentGiver);
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfTeamsExcludingOwnTeam(studentGiver, feedbackSessionResultsBundle);
             break;
         case OWN_TEAM:
             possibleRecipients.add(studentGiver.team);
@@ -145,7 +145,7 @@ public class PossibleRecipientsBundle {
 
         switch (recipientType) {
         case TEAMS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfTeams();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfTeams(feedbackSessionResultsBundle);
             possibleRecipients.remove(givingTeam);
             break;
         case SELF:
@@ -153,10 +153,10 @@ public class PossibleRecipientsBundle {
             possibleRecipients.add(givingTeam);
             break;
         case INSTRUCTORS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfInstructorEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfInstructorEmails(feedbackSessionResultsBundle);
             break;
         case STUDENTS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfStudentEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfStudentEmails(feedbackSessionResultsBundle);
             break;
         case OWN_TEAM_MEMBERS_INCLUDING_SELF:
             if (feedbackSessionResultsBundle.rosterTeamNameMembersTable.containsKey(givingTeam)) {
@@ -189,14 +189,14 @@ public class PossibleRecipientsBundle {
         case STUDENTS:
         case OWN_TEAM_MEMBERS:
         case OWN_TEAM_MEMBERS_INCLUDING_SELF:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfStudentEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfStudentEmails(feedbackSessionResultsBundle);
             break;
         case INSTRUCTORS:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfInstructorEmails();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfInstructorEmails(feedbackSessionResultsBundle);
             break;
         case TEAMS:
         case OWN_TEAM:
-            possibleRecipients = feedbackSessionResultsBundle.getSortedListOfTeams();
+            possibleRecipients = feedbackSessionResultsBundle.getSortedResponseBundle().getSortedListOfTeams(feedbackSessionResultsBundle);
             break;
         case NONE:
             possibleRecipients = new ArrayList<String>();

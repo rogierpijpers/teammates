@@ -844,7 +844,7 @@ public final class FeedbackSessionsLogic {
                     feedbackSessionName, courseId, userEmail, questionId, section);
         }
 
-        if (!results.isComplete) {
+        if (!results.isComplete()) {
             throw new ExceedingRangeException(ERROR_NUMBER_OF_RESPONSES_EXCEEDS_RANGE);
         }
         // sort responses by giver > recipient > qnNumber
@@ -868,7 +868,7 @@ public final class FeedbackSessionsLogic {
         exportBuilder.append(Const.EOL).append(Const.EOL);
 
         Set<Entry<FeedbackQuestionAttributes, List<FeedbackResponseAttributes>>> entrySet =
-                results.getQuestionResponseMap().entrySet();
+                results.getQuestionResponseMapBundle().getQuestionResponseMap(results).entrySet();
 
         if (filterText != null && !filterText.isEmpty()) {
             entrySet = filterQuestions(entrySet, filterText.toLowerCase());
@@ -943,10 +943,10 @@ public final class FeedbackSessionsLogic {
                         question, questionDetails,
                         possibleRecipientsForGiver, prevGiver));
                 String giverIdentifier = question.giverType == FeedbackParticipantType.TEAMS
-                                             ? fsrBundle.getFullNameFromRoster(response.giver)
+                                             ? fsrBundle.getRosterBundle().getFullNameFromRoster(response.giver, fsrBundle)
                                              : response.giver;
 
-                possibleRecipientsForGiver = new PossibleRecipientsBundle().getPossibleRecipients(question, giverIdentifier, fsrBundle);
+                possibleRecipientsForGiver = fsrBundle.getPossibleRecipientsBundle().getPossibleRecipients(question, giverIdentifier, fsrBundle);
             }
 
             removeParticipantIdentifierFromList(question.recipientType, possibleRecipientsForGiver,
@@ -972,7 +972,7 @@ public final class FeedbackSessionsLogic {
     /**
      * Given a participantIdentifier, remove it from participantIdentifierList.
      *
-     * <p>Before removal, {@link FeedbackSessionResultsBundle#getFullNameFromRoster} is used to
+     * <p>Before removal, {@link RosterBundle#getFullNameFromRoster} is used to
      * convert the identifier into a canonical form if the participantIdentifierType is TEAMS.
      */
     private void removeParticipantIdentifierFromList(
@@ -980,7 +980,7 @@ public final class FeedbackSessionsLogic {
             List<String> participantIdentifierList, String participantIdentifier,
             FeedbackSessionResultsBundle bundle) {
         if (participantIdentifierType == FeedbackParticipantType.TEAMS) {
-            participantIdentifierList.remove(bundle.getFullNameFromRoster(participantIdentifier));
+            participantIdentifierList.remove(bundle.getRosterBundle().getFullNameFromRoster(participantIdentifier, bundle));
         } else {
             participantIdentifierList.remove(participantIdentifier);
         }
@@ -1013,7 +1013,7 @@ public final class FeedbackSessionsLogic {
 
         for (String possibleGiverWithNoResponses : remainingPossibleGivers) {
             List<String> possibleRecipientsForRemainingGiver =
-                    new PossibleRecipientsBundle().getPossibleRecipients(entry.getKey(), possibleGiverWithNoResponses, results);
+                    results.getPossibleRecipientsBundle().getPossibleRecipients(entry.getKey(), possibleGiverWithNoResponses, results);
 
             exportBuilder.append(getRowsOfPossibleRecipientsInCsvFormat(results,
                     question, questionDetails, possibleRecipientsForRemainingGiver,
@@ -1034,19 +1034,19 @@ public final class FeedbackSessionsLogic {
             List<String> possibleRecipientsForGiver, String giver) {
         StringBuilder exportBuilder = new StringBuilder();
         for (String possibleRecipient : possibleRecipientsForGiver) {
-            String giverName = results.getFullNameFromRoster(giver);
-            String giverLastName = results.getLastNameFromRoster(giver);
-            String giverEmail = results.getDisplayableEmailFromRoster(giver);
-            String possibleRecipientName = results.getFullNameFromRoster(possibleRecipient);
-            String possibleRecipientLastName = results.getLastNameFromRoster(possibleRecipient);
-            String possibleRecipientEmail = results.getDisplayableEmailFromRoster(possibleRecipient);
+            String giverName = results.getRosterBundle().getFullNameFromRoster(giver, results);
+            String giverLastName = results.getRosterBundle().getLastNameFromRoster(giver, results);
+            String giverEmail = results.getRosterBundle().getDisplayableEmailFromRoster(giver, results);
+            String possibleRecipientName = results.getRosterBundle().getFullNameFromRoster(possibleRecipient, results);
+            String possibleRecipientLastName = results.getRosterBundle().getLastNameFromRoster(possibleRecipient, results);
+            String possibleRecipientEmail = results.getRosterBundle().getDisplayableEmailFromRoster(possibleRecipient, results);
 
             if (questionDetails.shouldShowNoResponseText(question)) {
-                exportBuilder.append(SanitizationHelper.sanitizeForCsv(results.getTeamNameFromRoster(giver))
+                exportBuilder.append(SanitizationHelper.sanitizeForCsv(results.getRosterBundle().getTeamNameFromRoster(giver, results))
                         + "," + SanitizationHelper.sanitizeForCsv(StringHelper.removeExtraSpace(giverName))
                         + "," + SanitizationHelper.sanitizeForCsv(StringHelper.removeExtraSpace(giverLastName))
                         + "," + SanitizationHelper.sanitizeForCsv(StringHelper.removeExtraSpace(giverEmail))
-                        + "," + SanitizationHelper.sanitizeForCsv(results.getTeamNameFromRoster(possibleRecipient))
+                        + "," + SanitizationHelper.sanitizeForCsv(results.getRosterBundle().getTeamNameFromRoster(possibleRecipient, results))
                         + "," + SanitizationHelper.sanitizeForCsv(StringHelper.removeExtraSpace(possibleRecipientName))
                         + "," + SanitizationHelper.sanitizeForCsv(StringHelper.removeExtraSpace(possibleRecipientLastName))
                         + "," + SanitizationHelper.sanitizeForCsv(StringHelper.removeExtraSpace(possibleRecipientEmail))

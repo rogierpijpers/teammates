@@ -115,7 +115,7 @@ public class InstructorFeedbackResultsPageAction extends Action {
         // Warning for section wise viewing in case of many responses.
         boolean isShowSectionWarningForQuestionView = data.isLargeNumberOfRespondents()
                                                    && Const.FeedbackSessionResults.QUESTION_SORT_TYPE.equals(sortType);
-        boolean isShowSectionWarningForParticipantView = !data.getBundle().isComplete
+        boolean isShowSectionWarningForParticipantView = !data.getBundle().isComplete()
                                                    && !Const.FeedbackSessionResults.QUESTION_SORT_TYPE.equals(sortType);
 
         // Warning for section wise does not make sense if there are no multiple sections.
@@ -191,7 +191,7 @@ public class InstructorFeedbackResultsPageAction extends Action {
                                                1, sortType);
                 // set isComplete to true to prevent behavior when there are too many responses,
                 // such as the display of warning messages
-                bundle.isComplete = true;
+                bundle.complete();
             } else {
                 // bundle for all questions, with a selected section
                 bundle = logic.getFeedbackSessionResultsForInstructorInSection(feedbackSessionName, courseId,
