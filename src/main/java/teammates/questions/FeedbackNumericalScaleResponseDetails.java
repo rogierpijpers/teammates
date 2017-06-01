@@ -1,4 +1,4 @@
-package teammates.common.datatransfer.questions;
+package teammates.questions;
 
 import teammates.common.util.Logger;
 import teammates.common.util.StringHelper;

@@ -1,4 +1,4 @@
-package teammates.common.datatransfer.questions;
+package teammates.questions;
 
 import java.util.Comparator;
 import java.util.List;

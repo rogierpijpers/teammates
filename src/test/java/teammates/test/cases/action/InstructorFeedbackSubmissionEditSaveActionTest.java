@@ -7,7 +7,7 @@ import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
 import teammates.common.datatransfer.attributes.FeedbackSessionAttributes;
 import teammates.common.datatransfer.attributes.InstructorAttributes;
-import teammates.common.datatransfer.questions.FeedbackNumericalScaleQuestionDetails;
+import teammates.questions.FeedbackNumericalScaleQuestionDetails;
 import teammates.common.exception.NullPostParameterException;
 import teammates.common.util.Const;
 import teammates.common.util.EmailType;

@@ -8,9 +8,9 @@ import java.util.List;
 
 import com.google.appengine.api.datastore.Text;
 
-import teammates.common.datatransfer.questions.FeedbackQuestionType;
-import teammates.common.datatransfer.questions.FeedbackResponseDetails;
-import teammates.common.datatransfer.questions.FeedbackTextResponseDetails;
+import teammates.questions.FeedbackQuestionType;
+import teammates.questions.FeedbackResponseDetails;
+import teammates.questions.FeedbackTextResponseDetails;
 import teammates.common.util.Const;
 import teammates.common.util.FieldValidator;
 import teammates.common.util.JsonUtils;

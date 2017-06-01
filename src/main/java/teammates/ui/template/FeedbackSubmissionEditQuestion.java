@@ -6,7 +6,7 @@ import com.google.appengine.api.datastore.Text;
 
 import teammates.common.datatransfer.FeedbackParticipantType;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
-import teammates.common.datatransfer.questions.FeedbackQuestionType;
+import teammates.questions.FeedbackQuestionType;
 
 public class FeedbackSubmissionEditQuestion {
     private String courseId;

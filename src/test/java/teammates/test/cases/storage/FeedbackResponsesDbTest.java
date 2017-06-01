@@ -11,9 +11,9 @@ import org.testng.annotations.Test;
 
 import teammates.common.datatransfer.DataBundle;
 import teammates.common.datatransfer.attributes.FeedbackResponseAttributes;
-import teammates.common.datatransfer.questions.FeedbackQuestionType;
-import teammates.common.datatransfer.questions.FeedbackResponseDetails;
-import teammates.common.datatransfer.questions.FeedbackTextResponseDetails;
+import teammates.questions.FeedbackQuestionType;
+import teammates.questions.FeedbackResponseDetails;
+import teammates.questions.FeedbackTextResponseDetails;
 import teammates.common.exception.EntityAlreadyExistsException;
 import teammates.common.exception.EntityDoesNotExistException;
 import teammates.common.exception.InvalidParametersException;

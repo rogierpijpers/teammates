@@ -5,7 +5,7 @@ import java.util.List;
 
 import teammates.common.datatransfer.attributes.AccountAttributes;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
-import teammates.common.datatransfer.questions.FeedbackQuestionDetails;
+import teammates.questions.FeedbackQuestionDetails;
 import teammates.ui.template.FeedbackQuestionCopyTable;
 import teammates.ui.template.FeedbackQuestionTableRow;
 

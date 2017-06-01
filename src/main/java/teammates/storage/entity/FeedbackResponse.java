@@ -10,7 +10,7 @@ import javax.jdo.listener.StoreCallback;
 
 import com.google.appengine.api.datastore.Text;
 
-import teammates.common.datatransfer.questions.FeedbackQuestionType;
+import teammates.questions.FeedbackQuestionType;
 import teammates.common.util.Const;
 
 /**

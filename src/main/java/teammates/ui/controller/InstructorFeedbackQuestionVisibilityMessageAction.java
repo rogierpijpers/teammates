@@ -4,7 +4,7 @@ import java.util.List;
 
 import teammates.common.datatransfer.FeedbackParticipantType;
 import teammates.common.datatransfer.attributes.FeedbackQuestionAttributes;
-import teammates.common.datatransfer.questions.FeedbackQuestionType;
+import teammates.questions.FeedbackQuestionType;
 import teammates.common.util.Assumption;
 import teammates.common.util.Const;
 import teammates.ui.pagedata.InstructorFeedbackQuestionVisibilityMessagePageData;

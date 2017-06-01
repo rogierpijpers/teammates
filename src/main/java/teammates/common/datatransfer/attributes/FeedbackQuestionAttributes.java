@@ -10,9 +10,9 @@ import org.json.JSONObject;
 import com.google.appengine.api.datastore.Text;
 
 import teammates.common.datatransfer.FeedbackParticipantType;
-import teammates.common.datatransfer.questions.FeedbackQuestionDetails;
-import teammates.common.datatransfer.questions.FeedbackQuestionType;
-import teammates.common.datatransfer.questions.FeedbackTextQuestionDetails;
+import teammates.questions.FeedbackQuestionDetails;
+import teammates.questions.FeedbackQuestionType;
+import teammates.questions.FeedbackTextQuestionDetails;
 import teammates.common.util.Const;
 import teammates.common.util.FieldValidator;
 import teammates.common.util.JsonUtils;
