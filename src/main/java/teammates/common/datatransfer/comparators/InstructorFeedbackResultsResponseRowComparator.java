@@ -1,4 +1,6 @@
-package teammates.ui.template;
+package teammates.common.datatransfer.comparators;
+
+import teammates.ui.template.InstructorFeedbackResultsResponseRow;
 
 import java.util.Comparator;
 
@@ -6,6 +8,7 @@ import java.util.Comparator;
  * Created by Rogier on 1-6-2017.
  */
 public class InstructorFeedbackResultsResponseRowComparator implements Comparator<InstructorFeedbackResultsResponseRow> {
+
     @Override
     public int compare(InstructorFeedbackResultsResponseRow o1,
                        InstructorFeedbackResultsResponseRow o2) {
@@ -28,4 +31,5 @@ public class InstructorFeedbackResultsResponseRowComparator implements Comparato
 
         return o1.getRecipientDisplayableIdentifier().compareTo(o2.getRecipientDisplayableIdentifier());
     }
+
 }
